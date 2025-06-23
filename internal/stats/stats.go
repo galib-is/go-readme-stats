@@ -15,12 +15,12 @@ type repo struct {
 	Fork bool   `json:"fork"`
 }
 
-type lang struct {
+type Lang struct {
 	Name    string  `json:"name"`
 	Percent float64 `json:"percent"`
 }
 
-func FetchStats(username string, ignoredLangsPath string) []lang {
+func FetchStats(username string, ignoredLangsPath string) []Lang {
 	repos := fetchRepoNames(username)
 	ignoredLangs := readIgnoredLanguages(ignoredLangsPath)
 
@@ -90,18 +90,18 @@ func fetchRepoLanguages(username string, repoName string) map[string]int {
 	return langs
 }
 
-func calcStats(langTotals map[string]int) []lang {
+func calcStats(langTotals map[string]int) []Lang {
 	totalBytes := 0
 	for _, bytes := range langTotals {
 		totalBytes += bytes
 	}
 
-	var result []lang
+	var result []Lang
 	for langName, bytes := range langTotals {
 		percent := float64(bytes) / float64(totalBytes) * 100
 		percent = math.Round(percent*100) / 100
 
-		result = append(result, lang{
+		result = append(result, Lang{
 			Name:    langName,
 			Percent: percent,
 		})

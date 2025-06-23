@@ -44,3 +44,13 @@ func FetchLanguageColours(outputFile string) error {
 
 	return os.WriteFile(outputFile, jsonData, 0644)
 }
+
+func EnsureLanguageColours(file string) error {
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		err := FetchLanguageColours(file)
+		if err != nil {
+			return fmt.Errorf("failed to fetch and convert language colours: %v", err)
+		}
+	}
+	return nil
+}
