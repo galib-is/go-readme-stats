@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"go-readme-stats/internal/stats"
 	"go-readme-stats/scripts"
 )
 
@@ -19,4 +20,6 @@ func main() {
 	} else {
 		fmt.Println("file exists")
 	}
+
+	fmt.Println(stats.FetchStats("galib-i", "ignored_languages.json"))
 }
