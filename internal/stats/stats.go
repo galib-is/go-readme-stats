@@ -99,7 +99,7 @@ func calcStats(langTotals map[string]int) []Lang {
 	var result []Lang
 	for langName, bytes := range langTotals {
 		percent := float64(bytes) / float64(totalBytes) * 100
-		percent = math.Round(percent*100) / 100
+		percent = math.Round(percent*10) / 10
 
 		result = append(result, Lang{
 			Name:    langName,
