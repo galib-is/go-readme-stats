@@ -18,6 +18,7 @@ type repo struct {
 type Lang struct {
 	Name    string  `json:"name"`
 	Percent float64 `json:"percent"`
+	Colour  string
 }
 
 func FetchStats(username string, ignoredLangsPath string) []Lang {
