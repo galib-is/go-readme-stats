@@ -39,7 +39,7 @@
 
         <!-- Bars -->
         {{range $i, $lang := .Languages}}
-          <rect mask="url(#rect-mask)" x="{{sumPrev $.Languages $i}}%" y="0" width="100%" height="100%" fill="{{$lang.Colour}}"/>
+          <rect mask="url(#rect-mask)" x="{{sumPrev $.Languages $i}}%" y="0" width="{{$lang.Percent}}%" height="100%" fill="{{$lang.Colour}}"/>
         {{end}}
 
         <!-- Dividers -->
