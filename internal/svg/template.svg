@@ -1,4 +1,3 @@
-
 <svg width="344" height="{{.Height}}" viewBox="0 0 344 {{.Height}}" fill="none" xmlns="http://www.w3.org/2000/svg">
 
   <style>
@@ -40,14 +39,10 @@
         <!-- Bars -->
         {{range $i, $lang := .Languages}}
           <rect mask="url(#rect-mask)" x="{{sumPrev $.Languages $i}}%" y="0" width="{{$lang.Percent}}%" height="100%" fill="{{$lang.Colour}}"/>
+          {{if ne $i 0}} <!-- Divider, avoid first -->
+            <rect x="{{sumPrev $.Languages $i}}%" y="0" width="0.6%" height="100%" fill="#0D1117"/>
+          {{end}}
         {{end}}
-
-        <!-- Dividers -->
-        <!--
-        <rect x="48.93%" y="0" width="0.6%" height="100%" fill="#0D1117"/>
-        <rect x="95.96%" y="0" width="0.6%" height="100%" fill="#0D1117"/>
-        <rect x="97.62%" y="0" width="0.6%" height="100%" fill="#0D1117"/>
-        <rect x="99.25%" y="0" width="0.6%" height="100%" fill="#0D1117"/> -->
       </svg>
 
       <!-- Legend -->
