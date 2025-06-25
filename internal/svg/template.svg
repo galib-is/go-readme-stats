@@ -39,7 +39,7 @@
         <!-- Bars -->
         {{range $i, $lang := .Languages}}
           <rect mask="url(#rect-mask)" x="{{sumPrev $.Languages $i}}%" y="0" width="{{$lang.Percent}}%" height="100%" fill="{{$lang.Colour}}"/>
-          {{if ne $i 0}} <!-- Divider, avoid first -->
+          {{if ne $i 0}} <!-- Divider -->
             <rect x="{{sumPrev $.Languages $i}}%" y="0" width="0.6%" height="100%" fill="#0D1117"/>
           {{end}}
         {{end}}
@@ -47,7 +47,7 @@
 
       <!-- Legend -->
       <!-- Row 1 -->
-      {{if ge .LanguagesLen 1}}
+      {{if ge .LanguageCount 1}}
         <g transform="translate(0, 25)">
           <circle cx="5" cy="6" r="4.5" fill="{{(index .Languages 0).Colour}}"/>
           <text x="18" y="10.5" class="lang-name">
@@ -56,7 +56,7 @@
           </text>
         </g>
       {{end}}
-      {{if ge .LanguagesLen 2}}
+      {{if ge .LanguageCount 2}}
         <g transform="translate(150, 25)">
           <use href="#legend-dot" fill="{{(index .Languages 1).Colour}}"/>
           <text x="18" y="10.5" class="lang-name">
@@ -67,7 +67,7 @@
       {{end}}
 
       <!-- Row 2 -->
-      {{if ge .LanguagesLen 3}}
+      {{if ge .LanguageCount 3}}
         <g transform="translate(0, 45)">
           <circle cx="5" cy="6" r="4.5" fill="{{(index .Languages 2).Colour}}"/>
           <text x="18" y="10.5" class="lang-name">
@@ -76,7 +76,7 @@
           </text>
         </g>
       {{end}}
-      {{if ge .LanguagesLen 4}}
+      {{if ge .LanguageCount 4}}
         <g transform="translate(150, 45)">
           <use href="#legend-dot" fill="{{(index .Languages 3).Colour}}"/>
           <text x="18" y="10.5" class="lang-name">
@@ -87,7 +87,7 @@
       {{end}}
 
       <!-- Row 3 -->
-      {{if ge .LanguagesLen 5}}
+      {{if ge .LanguageCount 5}}
         <g transform="translate(0, 65)">
           <circle cx="5" cy="6" r="4.5" fill="{{(index .Languages 4).Colour}}"/>
           <text x="18" y="10.5" class="lang-name">
@@ -96,7 +96,7 @@
           </text>
         </g>
       {{end}}
-      {{if ge .LanguagesLen 6}}
+      {{if ge .LanguageCount 6}}
         <g transform="translate(150, 65)">
           <circle cx="5" cy="6" r="4.5" fill="{{(index .Languages 5).Colour}}"/>
           <text x="18" y="10.5" class="lang-name">

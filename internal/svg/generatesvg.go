@@ -2,19 +2,26 @@ package svg
 
 import (
 	"bytes"
+	"fmt"
+	"html/template"
 	"net/http"
-	"text/template"
 
 	"go-readme-stats/internal/stats"
 
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	baseHeight   = 114.5
+	mediumHeight = 134.5
+	largeHeight  = 154.5
+)
+
 type SVGData struct {
-	Height       float64
-	Header       string
-	Languages    []stats.Lang
-	LanguagesLen int
+	Height        float64
+	Header        string
+	Languages     []stats.Lang
+	LanguageCount int
 }
 
 func GenerateSVG(c *gin.Context) {
@@ -23,17 +30,22 @@ func GenerateSVG(c *gin.Context) {
 	ignoredLangsPath := "ignored_languages.json"
 
 	languages := stats.FetchStats(username, ignoredLangsPath)
-	languageLen := len(languages)
-	height := calculateSVGHeight(languageLen)
+	languageCount := len(languages)
+	height := calculateSVGHeight(languageCount)
 
 	data := SVGData{
-		Height:       height,
-		Header:       header,
-		Languages:    languages,
-		LanguagesLen: languageLen,
+		Height:        height,
+		Header:        header,
+		Languages:     languages,
+		LanguageCount: languageCount,
 	}
 
-	svg := generateSVG(data)
+	svg, err := generateSVG(data)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error generating SVG")
+		return
+	}
+
 	c.Header("Content-Type", "image/svg+xml")
 	c.String(http.StatusOK, svg)
 }
@@ -41,35 +53,36 @@ func GenerateSVG(c *gin.Context) {
 func calculateSVGHeight(languageCount int) float64 {
 	switch {
 	case languageCount <= 2:
-		return 114.5
+		return baseHeight
 	case languageCount <= 4:
-		return 134.5
+		return mediumHeight
 	default:
-		return 154.5
+		return largeHeight
 	}
 }
 
-func generateSVG(data SVGData) string {
+func generateSVG(data SVGData) (string, error) {
 	tmpl := template.New("template.svg").Funcs(template.FuncMap{
-		"ge": func(a, b int) bool { return a >= b },
-		"sumPrev": func(langs []stats.Lang, idx int) float64 {
-			sum := 0.0
-			for i := range idx {
-				sum += langs[i].Percent
-			}
-			return sum
-		},
+		"sumPrev": sumPreviousPercent,
 	})
+
 	tmpl, err := tmpl.ParseFiles("internal/svg/template.svg")
 	if err != nil {
-		return "<svg><!-- template error --></svg>"
+		return "", fmt.Errorf("failed to parse template: %w", err)
 	}
 
 	var buf bytes.Buffer
-	err = tmpl.Execute(&buf, data)
-	if err != nil {
-		return "<svg><!-- execute error --></svg>"
+	if err := tmpl.Execute(&buf, data); err != nil {
+		return "", fmt.Errorf("failed to execute template: %w", err)
 	}
 
-	return buf.String()
+	return buf.String(), nil
+}
+
+func sumPreviousPercent(langs []stats.Lang, idx int) float64 {
+	sum := 0.0
+	for i := range idx {
+		sum += langs[i].Percent
+	}
+	return sum
 }
