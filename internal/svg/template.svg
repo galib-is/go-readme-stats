@@ -1,5 +1,5 @@
 
-<svg width="344" height="154.5" viewBox="0 0 344 154.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="344" height="{{.Height}}" viewBox="0 0 344 {{.Height}}" fill="none" xmlns="http://www.w3.org/2000/svg">
 
   <style>
     .header {
@@ -54,7 +54,7 @@
       <!-- Row 1 -->
       {{if ge .LanguagesLen 1}}
         <g transform="translate(0, 25)">
-          <circle cx="5" cy="6" r="4.5" fill="#b07219"/>
+          <circle cx="5" cy="6" r="4.5" fill="{{(index .Languages 0).Colour}}"/>
           <text x="18" y="10.5" class="lang-name">
             <tspan class="lang-name-bold">{{(index .Languages 0).Name}}</tspan>
             <tspan class="lang-percent">{{(index .Languages 0).Percent}}%</tspan>
@@ -63,7 +63,7 @@
       {{end}}
       {{if ge .LanguagesLen 2}}
         <g transform="translate(150, 25)">
-          <use href="#legend-dot" fill="#f1e05a"/>
+          <use href="#legend-dot" fill="{{(index .Languages 1).Colour}}"/>
           <text x="18" y="10.5" class="lang-name">
             <tspan class="lang-name-bold">{{(index .Languages 1).Name}}</tspan>
             <tspan class="lang-percent">{{(index .Languages 1).Percent}}%</tspan>
@@ -74,7 +74,7 @@
       <!-- Row 2 -->
       {{if ge .LanguagesLen 3}}
         <g transform="translate(0, 45)">
-          <circle cx="5" cy="6" r="4.5" fill="#663399"/>
+          <circle cx="5" cy="6" r="4.5" fill="{{(index .Languages 2).Colour}}"/>
           <text x="18" y="10.5" class="lang-name">
             <tspan class="lang-name-bold">{{(index .Languages 2).Name}}</tspan>
             <tspan class="lang-percent">{{(index .Languages 2).Percent}}%</tspan>
@@ -83,7 +83,7 @@
       {{end}}
       {{if ge .LanguagesLen 4}}
         <g transform="translate(150, 45)">
-          <use href="#legend-dot" fill="#00ADD8"/>
+          <use href="#legend-dot" fill="{{(index .Languages 3).Colour}}"/>
           <text x="18" y="10.5" class="lang-name">
             <tspan class="lang-name-bold">{{(index .Languages 3).Name}}</tspan>
             <tspan class="lang-percent">{{(index .Languages 3).Percent}}%</tspan>
@@ -94,7 +94,7 @@
       <!-- Row 3 -->
       {{if ge .LanguagesLen 5}}
         <g transform="translate(0, 65)">
-          <circle cx="5" cy="6" r="4.5" fill="#e34c26"/>
+          <circle cx="5" cy="6" r="4.5" fill="{{(index .Languages 4).Colour}}"/>
           <text x="18" y="10.5" class="lang-name">
             <tspan class="lang-name-bold">{{(index .Languages 4).Name}}</tspan>
             <tspan class="lang-percent">{{(index .Languages 4).Percent}}%</tspan>
@@ -103,7 +103,7 @@
       {{end}}
       {{if ge .LanguagesLen 6}}
         <g transform="translate(150, 65)">
-          <circle cx="5" cy="6" r="4.5" fill="#e34c26"/>
+          <circle cx="5" cy="6" r="4.5" fill="{{(index .Languages 5).Colour}}"/>
           <text x="18" y="10.5" class="lang-name">
             <tspan class="lang-name-bold">{{(index .Languages 5).Name}}</tspan>
             <tspan class="lang-percent">{{(index .Languages 5).Percent}}%</tspan>

@@ -97,18 +97,42 @@ func calcStats(langTotals map[string]int) []Lang {
 		totalBytes += bytes
 	}
 
+	colours := loadLanguageColors()
+
 	var result []Lang
 	for langName, bytes := range langTotals {
 		percent := float64(bytes) / float64(totalBytes) * 100
 		percent = math.Round(percent*10) / 10
 
+		colour, exists := colours[langName]
+		if !exists {
+			colour = "#858585"
+		}
+
 		result = append(result, Lang{
 			Name:    langName,
 			Percent: percent,
+			Colour:  colour,
 		})
 	}
 
 	return result
+}
+
+func loadLanguageColors() map[string]string {
+	data, err := os.ReadFile("internal/data/colours.json")
+	if err != nil {
+		log.Printf("Warning: Failed to read colors file: %v", err)
+		return make(map[string]string)
+	}
+
+	var colors map[string]string
+	if err := json.Unmarshal(data, &colors); err != nil {
+		log.Printf("Warning: Failed to parse colors file: %v", err)
+		return make(map[string]string)
+	}
+
+	return colors
 }
 
 func readIgnoredLanguages(filename string) map[string]struct{} {

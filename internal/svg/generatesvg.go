@@ -11,6 +11,7 @@ import (
 )
 
 type SVGData struct {
+	Height       float64
 	Header       string
 	Languages    []stats.Lang
 	LanguagesLen int
@@ -18,18 +19,18 @@ type SVGData struct {
 
 func GenerateSVG(c *gin.Context) {
 	header := "Languages"
-	languages := []stats.Lang{
-		{Name: "Java", Percent: 48.9, Colour: "#b07219"},
-		{Name: "JavaScript", Percent: 47.0, Colour: "#f1e05a"},
-		{Name: "CSS", Percent: 1.7, Colour: "#663399"},
-		{Name: "Go", Percent: 1.6, Colour: "#00ADD8"},
-		{Name: "HTML", Percent: 0.8, Colour: "#e34c26"},
-	}
+	username := "galib-i"
+	ignoredLangsPath := "ignored_languages.json"
+
+	languages := stats.FetchStats(username, ignoredLangsPath)
+	languageLen := len(languages)
+	height := calculateSVGHeight(languageLen)
 
 	data := SVGData{
+		Height:       height,
 		Header:       header,
 		Languages:    languages,
-		LanguagesLen: len(languages),
+		LanguagesLen: languageLen,
 	}
 
 	svg := generateSVG(data)
@@ -37,12 +38,23 @@ func GenerateSVG(c *gin.Context) {
 	c.String(http.StatusOK, svg)
 }
 
+func calculateSVGHeight(languageCount int) float64 {
+	switch {
+	case languageCount <= 2:
+		return 114.5
+	case languageCount <= 4:
+		return 134.5
+	default:
+		return 154.5
+	}
+}
+
 func generateSVG(data SVGData) string {
 	tmpl := template.New("template.svg").Funcs(template.FuncMap{
 		"ge": func(a, b int) bool { return a >= b },
 		"sumPrev": func(langs []stats.Lang, idx int) float64 {
 			sum := 0.0
-			for i := 0; i < idx; i++ {
+			for i := range idx {
 				sum += langs[i].Percent
 			}
 			return sum
