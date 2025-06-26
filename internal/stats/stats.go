@@ -58,18 +58,7 @@ func FetchStats(ignoredLangsPath string) ([]Lang, error) {
 			langTotals[lang] += bytes
 		}
 	}
-	langTotals = map[string]int{
-		"Go":         1000,
-		"JavaScript": 1000,
-		"TypeScript": 1000,
-		"Python":     1000,
-		"C":          500,
-		"C#":         1000,
-		"Java":       1000,
-		"C++":        1000,
-		"Rust":       1500,
-		"PHP":        1000,
-	}
+
 	stats := calculateStats(langTotals)
 	if err := addLanguageColours(stats); err != nil {
 		return nil, fmt.Errorf("failed to add colours: %w", err)
@@ -158,6 +147,19 @@ func calculateStats(langTotals map[string]int) []Lang {
 		return result[i].Percent > result[j].Percent
 	})
 
+	// Combine languages below top 5 into "Other"
+	if len(result) > 6 {
+		var otherPercent float64
+		for _, lang := range result[5:] {
+			otherPercent += lang.Percent
+		}
+
+		result = append(result[:5], Lang{
+			Name:    fmt.Sprintf("Other (%d)", len(result)-5),
+			Percent: math.Round(otherPercent*10) / 10,
+		})
+	}
+
 	return result
 }
 
@@ -171,7 +173,7 @@ func addLanguageColours(langs []Lang) error {
 	for i := range langs {
 		colour, exists := colours[langs[i].Name]
 		if !exists {
-			colour = "#858585"
+			colour = "#F0F6FC"
 		}
 		langs[i].Colour = colour
 	}
