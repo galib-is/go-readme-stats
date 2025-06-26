@@ -31,8 +31,8 @@ func FetchLanguageColours(outputFile string) error {
 	filtered := make(map[string]string)
 	for k, v := range data {
 		if m, ok := v.(map[string]any); ok {
-			if color, ok := m["color"].(string); ok {
-				filtered[k] = color
+			if colour, ok := m["colour"].(string); ok {
+				filtered[k] = colour
 			}
 		}
 	}

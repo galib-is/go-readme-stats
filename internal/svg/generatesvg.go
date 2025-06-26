@@ -29,7 +29,12 @@ func GenerateSVG(c *gin.Context) {
 	username := "galib-i"
 	ignoredLangsPath := "ignored_languages.json"
 
-	languages := stats.FetchStats(username, ignoredLangsPath)
+	languages, err := stats.FetchStats(username, ignoredLangsPath)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error fetching stats")
+		return
+	}
+
 	languageCount := len(languages)
 	height := calculateSVGHeight(languageCount)
 
