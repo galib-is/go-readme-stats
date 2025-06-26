@@ -12,9 +12,8 @@ import (
 )
 
 const (
-	baseHeight   = 114.5
-	mediumHeight = 134.5
-	largeHeight  = 154.5
+	baseHeight = 114.5
+	heightStep = 20.0
 )
 
 type SVGData struct {
@@ -26,10 +25,9 @@ type SVGData struct {
 
 func GenerateSVG(c *gin.Context) {
 	header := "Languages"
-	username := "galib-i"
 	ignoredLangsPath := "ignored_languages.json"
 
-	languages, err := stats.FetchStats(username, ignoredLangsPath)
+	languages, err := stats.FetchStats(ignoredLangsPath)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error fetching stats")
 		return
@@ -56,14 +54,9 @@ func GenerateSVG(c *gin.Context) {
 }
 
 func calculateSVGHeight(languageCount int) float64 {
-	switch {
-	case languageCount <= 2:
-		return baseHeight
-	case languageCount <= 4:
-		return mediumHeight
-	default:
-		return largeHeight
-	}
+	// Height increases by 20 every 2 languages
+	steps := (languageCount + 1) / 2
+	return baseHeight + float64(steps-1)*heightStep
 }
 
 func generateSVG(data SVGData) (string, error) {

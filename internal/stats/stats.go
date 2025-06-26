@@ -16,13 +16,13 @@ type repository struct {
 }
 
 type Lang struct {
-	Name    string  `json:"name"`
-	Percent float64 `json:"percent"`
-	Colour  string  `json:"colour"`
+	Name    string
+	Percent float64
+	Colour  string
 }
 
-func FetchStats(username string, ignoredLangsPath string) ([]Lang, error) {
-	repos, err := fetchRepoNames(username)
+func FetchStats(ignoredLangsPath string) ([]Lang, error) {
+	repos, err := fetchRepoNames()
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch repositories: %w", err)
 	}
@@ -30,6 +30,11 @@ func FetchStats(username string, ignoredLangsPath string) ([]Lang, error) {
 	ignoredLangs, err := readIgnoredLanguages(ignoredLangsPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read ignored languages: %w", err)
+	}
+
+	username, err := getUsername()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get authenticated user: %w", err)
 	}
 
 	langTotals := make(map[string]int)
@@ -52,6 +57,7 @@ func FetchStats(username string, ignoredLangsPath string) ([]Lang, error) {
 			langTotals[lang] += bytes
 		}
 	}
+
 	stats := calculateStats(langTotals)
 	if err := addLanguageColours(stats); err != nil {
 		return nil, fmt.Errorf("failed to add colours: %w", err)
@@ -59,8 +65,8 @@ func FetchStats(username string, ignoredLangsPath string) ([]Lang, error) {
 	return stats, nil
 }
 
-func fetchRepoNames(username string) ([]repository, error) {
-	url := fmt.Sprintf("https://api.github.com/users/%s/repos", username)
+func fetchRepoNames() ([]repository, error) {
+	url := "https://api.github.com/user/repos"
 	body, err := callAPI(url)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch repos: %w", err)
@@ -90,7 +96,17 @@ func fetchRepoLanguages(username string, repoName string) (map[string]int, error
 }
 
 func callAPI(url string) ([]byte, error) {
-	resp, err := http.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+		req.Header.Set("Authorization", "token "+token)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make HTTP request to %s: %w", url, err)
 	}
@@ -174,4 +190,21 @@ func readIgnoredLanguages(filename string) (map[string]struct{}, error) {
 	}
 
 	return set, nil
+}
+
+func getUsername() (string, error) {
+	body, err := callAPI("https://api.github.com/user")
+	if err != nil {
+		return "", fmt.Errorf("failed to get user info: %w", err)
+	}
+
+	var user struct {
+		Login string `json:"login"`
+	}
+
+	if err := json.Unmarshal(body, &user); err != nil {
+		return "", fmt.Errorf("failed to parse user info: %w", err)
+	}
+
+	return user.Login, nil
 }
