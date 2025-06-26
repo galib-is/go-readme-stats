@@ -8,6 +8,7 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"sort"
 )
 
 type repository struct {
@@ -137,6 +138,10 @@ func calculateStats(langTotals map[string]int) []Lang {
 			Percent: percent,
 		})
 	}
+
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Percent > result[j].Percent
+	})
 
 	return result
 }
