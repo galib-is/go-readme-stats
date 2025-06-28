@@ -4,19 +4,15 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
-	"net/http"
 
 	"go-readme-stats/internal/stats"
-
-	"github.com/gin-gonic/gin"
 )
 
 const (
-	baseHeight           = 114.5
-	heightStep           = 20.0
-	ignoredLanguagesPath = "config/ignored_languages.json"
-	templateName         = "template.svg"
-	templatePath         = "internal/svg/template.svg"
+	baseHeight   = 114.5
+	heightStep   = 20.0
+	templateName = "template.svg"
+	templatePath = "internal/svg/template.svg"
 )
 
 type SVGData struct {
@@ -27,16 +23,7 @@ type SVGData struct {
 	LanguageCount int
 }
 
-func GenerateSVG(c *gin.Context) {
-	theme := c.DefaultQuery("theme", DefaultTheme)
-	header := c.DefaultQuery("header", "Languages")
-
-	languages, err := stats.FetchStats(ignoredLanguagesPath)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Error fetching stats")
-		return
-	}
-
+func Generate(theme, header string, languages []stats.Lang) (string, error) {
 	languageCount := len(languages)
 
 	data := SVGData{
@@ -47,14 +34,7 @@ func GenerateSVG(c *gin.Context) {
 		LanguageCount: languageCount,
 	}
 
-	svg, err := generateSVG(data)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Error generating SVG")
-		return
-	}
-
-	c.Header("Content-Type", "image/svg+xml")
-	c.String(http.StatusOK, svg)
+	return generateSVG(data)
 }
 
 func calculateSVGHeight(languageCount int) float64 {
