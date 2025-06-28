@@ -20,6 +20,7 @@ const (
 )
 
 type SVGData struct {
+	Theme         Theme
 	Height        float64
 	Header        string
 	Languages     []stats.Lang
@@ -27,7 +28,8 @@ type SVGData struct {
 }
 
 func GenerateSVG(c *gin.Context) {
-	header := "Languages"
+	theme := c.DefaultQuery("theme", DefaultTheme)
+	header := c.DefaultQuery("header", "Languages")
 
 	languages, err := stats.FetchStats(ignoredLanguagesPath)
 	if err != nil {
@@ -38,6 +40,7 @@ func GenerateSVG(c *gin.Context) {
 	languageCount := len(languages)
 
 	data := SVGData{
+		Theme:         GetTheme(theme),
 		Height:        calculateSVGHeight(languageCount),
 		Header:        header,
 		Languages:     languages,

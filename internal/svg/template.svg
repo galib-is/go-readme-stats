@@ -3,7 +3,7 @@
   <style>
     .header {
       font: 600 16px "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
-      fill: #F0F6FC;
+      fill: {{.Theme.Text}};
     }
 
     .lang-name {
@@ -13,16 +13,16 @@
 
     .lang-name-bold {
       font-weight: 700;
-      fill: #F0F6FC;
+      fill: {{.Theme.Text}};
     }
 
     .lang-percent {
       font-weight: 400;
-      fill: #9198A1;
+      fill: {{.Theme.SecondaryText}};
     }
   </style>
 
-  <rect height="100%" width="100%" fill="#0D1117" rx="4" ry="4"/>
+  <rect height="100%" width="100%" fill="{{.Theme.Background}}" rx="4" ry="4"/>
 
   <g transform="translate(24, 0)">
     <g transform="translate(0, 32)">
@@ -40,7 +40,7 @@
         {{range $i, $lang := .Languages}}
           <rect mask="url(#rect-mask)" x="{{sumPrev $.Languages $i}}%" y="0" width="{{$lang.Percent}}%" height="100%" fill="{{$lang.Colour}}"/>
           {{if ne $i 0}} <!-- Divider -->
-            <rect x="{{sumPrev $.Languages $i}}%" y="0" width="0.6%" height="100%" fill="#0D1117"/>
+            <rect x="{{sumPrev $.Languages $i}}%" y="0" width="0.6%" height="100%" fill="{{$.Theme.Background}}"/>
           {{end}}
         {{end}}
       </svg>
