@@ -12,8 +12,11 @@ import (
 )
 
 const (
-	baseHeight = 114.5
-	heightStep = 20.0
+	baseHeight           = 114.5
+	heightStep           = 20.0
+	ignoredLanguagesPath = "config/ignored_languages.json"
+	templateName         = "template.svg"
+	templatePath         = "internal/svg/template.svg"
 )
 
 type SVGData struct {
@@ -25,19 +28,17 @@ type SVGData struct {
 
 func GenerateSVG(c *gin.Context) {
 	header := "Languages"
-	ignoredLangsPath := "ignored_languages.json"
 
-	languages, err := stats.FetchStats(ignoredLangsPath)
+	languages, err := stats.FetchStats(ignoredLanguagesPath)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error fetching stats")
 		return
 	}
 
 	languageCount := len(languages)
-	height := calculateSVGHeight(languageCount)
 
 	data := SVGData{
-		Height:        height,
+		Height:        calculateSVGHeight(languageCount),
 		Header:        header,
 		Languages:     languages,
 		LanguageCount: languageCount,
@@ -60,11 +61,11 @@ func calculateSVGHeight(languageCount int) float64 {
 }
 
 func generateSVG(data SVGData) (string, error) {
-	tmpl := template.New("template.svg").Funcs(template.FuncMap{
+	tmpl := template.New(templateName).Funcs(template.FuncMap{
 		"sumPrev": sumPreviousPercent,
 	})
 
-	tmpl, err := tmpl.ParseFiles("internal/svg/template.svg")
+	tmpl, err := tmpl.ParseFiles(templatePath)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse template: %w", err)
 	}
@@ -77,10 +78,10 @@ func generateSVG(data SVGData) (string, error) {
 	return buf.String(), nil
 }
 
-func sumPreviousPercent(langs []stats.Lang, idx int) float64 {
+func sumPreviousPercent(languages []stats.Lang, idx int) float64 {
 	sum := 0.0
 	for i := range idx {
-		sum += langs[i].Percent
+		sum += languages[i].Percent
 	}
 	return sum
 }

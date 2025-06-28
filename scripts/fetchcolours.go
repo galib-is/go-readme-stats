@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func FetchLanguageColours(outputFile string) error {
+func FetchLanguageColours(outputPath string) error {
 	resp, err := http.Get("https://raw.githubusercontent.com/github-linguist/linguist/refs/heads/main/lib/linguist/languages.yml")
 	if err != nil {
 		return fmt.Errorf("failed to fetch YAML: %v", err)
@@ -42,12 +42,12 @@ func FetchLanguageColours(outputFile string) error {
 		return fmt.Errorf("failed to marshal JSON: %v", err)
 	}
 
-	return os.WriteFile(outputFile, jsonData, 0644)
+	return os.WriteFile(outputPath, jsonData, 0644)
 }
 
-func EnsureLanguageColours(file string) error {
-	if _, err := os.Stat(file); os.IsNotExist(err) {
-		err := FetchLanguageColours(file)
+func EnsureLanguageColours(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err := FetchLanguageColours(path)
 		if err != nil {
 			return fmt.Errorf("failed to fetch and convert language colours: %v", err)
 		}

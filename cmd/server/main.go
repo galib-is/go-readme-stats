@@ -3,12 +3,11 @@ package main
 import (
 	"log"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
 	"go-readme-stats/internal/svg"
 	"go-readme-stats/scripts"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -17,9 +16,9 @@ func main() {
 		log.Printf("Warning: Could not load .env file: %v", err)
 	}
 
-	output := "internal/data/colours.json"
+	outputPath := "internal/data/colours.json"
 
-	if err := scripts.EnsureLanguageColours(output); err != nil {
+	if err := scripts.EnsureLanguageColours(outputPath); err != nil {
 		log.Fatalf("could not ensure colours file: %v", err)
 	}
 
