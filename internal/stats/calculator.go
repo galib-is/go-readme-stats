@@ -8,11 +8,15 @@ import (
 
 const (
 	maxVisibleLanguages = 6
-	topLanguagesCount   = 5
-	percentPrecision    = 10
+	topLanguagesCount   = 5  // Number of individual languages before grouping into "Other"
+	percentPrecision    = 10 // One decimal precision (e.g. 10.4%)
 )
 
+// calculateStats converts language byte counts to percentages.
+// Languages are sorted by descending percentage, then ascending name.
+// If more than maxVisibleLanguages exist, languages beyond topLanguagesCount are grouped into "Other".
 func calculateStats(languageTotals map[string]int) []Lang {
+	// Calculate total bytes across all languages
 	totalBytes := 0
 	for _, bytes := range languageTotals {
 		totalBytes += bytes
@@ -26,6 +30,7 @@ func calculateStats(languageTotals map[string]int) []Lang {
 		})
 	}
 
+	// Sort by percentage (desc), then by name (asc) for consistent ordering
 	sort.Slice(result, func(i, j int) bool {
 		if result[i].Percent == result[j].Percent {
 			return result[i].Name < result[j].Name

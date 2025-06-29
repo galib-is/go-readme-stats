@@ -55,6 +55,8 @@ func getUsername() (string, error) {
 	return user.Login, nil
 }
 
+// callAPI makes authenticated HTTP requests to the GitHub API.
+// Uses GITHUB_TOKEN environment variable for authentication if available.
 func callAPI(url string) ([]byte, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

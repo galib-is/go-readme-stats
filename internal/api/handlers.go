@@ -1,3 +1,5 @@
+// Package api provides HTTP handlers
+
 package api
 
 import (
@@ -10,6 +12,12 @@ import (
 
 const ignoredLanguagesPath = "config/ignored_languages.json"
 
+// GetLanguageStats handles GET requests for SVG generation.
+// Query parameters:
+//   - theme: SVG theme name (defaults to DefaultTheme - dark)
+//   - header: Custom header text (defaults to "Languages")
+//
+// Returns an SVG image with HTTP 200 on success, or HTTP 500 on error.
 func GetLanguageStats(c *gin.Context) {
 	theme := c.DefaultQuery("theme", svg.DefaultTheme)
 	header := c.DefaultQuery("header", "Languages")

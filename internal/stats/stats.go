@@ -23,6 +23,8 @@ type Lang struct {
 	Colour  string
 }
 
+// FetchStats retrieves language statistics for the authenticated user.
+// Excludes forked repositories and languages from the ignored languages file.
 func FetchStats(ignoredLanguagesPath string) ([]Lang, error) {
 	repos, err := fetchRepoNames()
 	if err != nil {

@@ -1,3 +1,5 @@
+// Package main starts a web server to generate SVGs for the user's GitHub language statistics.
+
 package main
 
 import (
@@ -10,17 +12,9 @@ import (
 )
 
 func main() {
-	// Load .env file
 	if err := godotenv.Load(); err != nil {
 		log.Printf("Warning: Could not load .env file: %v", err)
 	}
-
-	/*
-		outputPath := "internal/data/colours.json"
-			if err := scripts.EnsureLanguageColours(outputPath); err != nil {
-				log.Fatalf("could not ensure colours file: %v", err)
-			}
-	*/
 
 	router := gin.Default()
 	router.GET("/langs", api.GetLanguageStats)

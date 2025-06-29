@@ -10,6 +10,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// FetchLanguageColours downloads and converts GitHub's language colours to JSON.
+// Fetches the official YAML file and extracts only the colour mappings.
 func FetchLanguageColours(outputPath string) error {
 	resp, err := http.Get("https://raw.githubusercontent.com/github-linguist/linguist/refs/heads/main/lib/linguist/languages.yml")
 	if err != nil {
@@ -45,6 +47,7 @@ func FetchLanguageColours(outputPath string) error {
 	return os.WriteFile(outputPath, jsonData, 0644)
 }
 
+// EnsureLanguageColours creates the language colours file if it doesn't exist.
 func EnsureLanguageColours(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		err := FetchLanguageColours(path)

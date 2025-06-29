@@ -15,14 +15,16 @@ const (
 	templatePath = "internal/svg/template.svg"
 )
 
+// SVGData holds the data required for SVG template rendering.
 type SVGData struct {
 	Theme         Theme
 	Height        float64
 	Header        string
-	Languages     []stats.Lang
+	Languages     []stats.Lang // Includes colour codes
 	LanguageCount int
 }
 
+// Generate creates an SVG of language statistics.
 func Generate(theme, header string, languages []stats.Lang) (string, error) {
 	languageCount := len(languages)
 
@@ -37,18 +39,17 @@ func Generate(theme, header string, languages []stats.Lang) (string, error) {
 	return generateSVG(data)
 }
 
+// calculateSVGHeight returns SVG height adjusted for language count.
 func calculateSVGHeight(languageCount int) float64 {
-	// Height increases by 20 every 2 languages
 	steps := (languageCount + 1) / 2
 	return baseHeight + float64(steps-1)*heightStep
 }
 
 func generateSVG(data SVGData) (string, error) {
-	tmpl := template.New(templateName).Funcs(template.FuncMap{
+	tmpl, err := template.New(templateName).Funcs(template.FuncMap{
 		"sumPrev": sumPreviousPercent,
-	})
+	}).ParseFiles(templatePath)
 
-	tmpl, err := tmpl.ParseFiles(templatePath)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse template: %w", err)
 	}
@@ -61,6 +62,7 @@ func generateSVG(data SVGData) (string, error) {
 	return buf.String(), nil
 }
 
+// sumPreviousPercent calculates cumulative percentage for stacked progress bars.
 func sumPreviousPercent(languages []stats.Lang, idx int) float64 {
 	sum := 0.0
 	for i := range idx {
