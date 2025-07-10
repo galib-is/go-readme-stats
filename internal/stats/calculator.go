@@ -26,7 +26,7 @@ func calculateStats(languageTotals map[string]int) []Lang {
 	for lang, bytes := range languageTotals {
 		result = append(result, Lang{
 			Name:    lang,
-			Percent: roundPercent(float64(bytes) / float64(totalBytes) * 100),
+			Percent: float64(bytes) / float64(totalBytes) * 100,
 		})
 	}
 
@@ -48,8 +48,12 @@ func calculateStats(languageTotals map[string]int) []Lang {
 
 		result = append(result[:topLanguagesCount], Lang{
 			Name:    fmt.Sprintf("Other (%d)", len(result)-topLanguagesCount),
-			Percent: roundPercent(otherPercent),
+			Percent: otherPercent,
 		})
+	}
+
+	for i := range result {
+		result[i].Percent = roundPercent(result[i].Percent)
 	}
 
 	return result
