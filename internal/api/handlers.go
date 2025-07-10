@@ -12,6 +12,12 @@ import (
 
 const ignoredLanguagesPath = "config/ignored_languages.json"
 
+// Add these variables for dependency injection and testing
+var (
+	FetchStats  = stats.FetchStats
+	GenerateSVG = svg.Generate
+)
+
 // GetLanguageStats handles GET requests for SVG generation.
 // Query parameters:
 //   - theme: SVG theme name (defaults to DefaultTheme - dark)
@@ -22,13 +28,13 @@ func GetLanguageStats(c *gin.Context) {
 	theme := c.DefaultQuery("theme", svg.DefaultTheme)
 	header := c.DefaultQuery("header", "Languages")
 
-	languages, err := stats.FetchStats(ignoredLanguagesPath)
+	languages, err := FetchStats(ignoredLanguagesPath)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error fetching stats")
 		return
 	}
 
-	svgContent, err := svg.Generate(theme, header, languages)
+	svgContent, err := GenerateSVG(theme, header, languages)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error generating SVG")
 		return

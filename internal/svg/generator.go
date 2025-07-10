@@ -15,7 +15,6 @@ const (
 	templatePath = "internal/svg/template.svg"
 )
 
-// SVGData holds the data required for SVG template rendering.
 type SVGData struct {
 	Theme         Theme
 	Height        float64
