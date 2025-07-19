@@ -25,8 +25,9 @@ func Favicon(c *gin.Context) {
 func GetLanguageStats(c *gin.Context) {
 	theme := c.DefaultQuery("theme", svg.DefaultTheme)
 	header := c.DefaultQuery("header", "Languages")
+	mode := c.DefaultQuery("mode", "bytes")
 
-	languages, err := FetchStats(ignoredLanguages)
+	languages, err := FetchStats(ignoredLanguages, mode)
 	if err != nil {
 		log.Printf("Error: Failed to fetch stats for request %s: %v", c.Request.URL.String(), err)
 		c.String(http.StatusInternalServerError, "Error fetching stats")

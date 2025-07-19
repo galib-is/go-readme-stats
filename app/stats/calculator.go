@@ -8,25 +8,37 @@ import (
 
 const (
 	maxVisibleLanguages = 6
-	topLanguagesCount   = 5  // Number of individual languages before grouping into "Other"
-	percentPrecision    = 10 // One decimal precision (e.g. 10.4%)
+	topLanguagesCount   = maxVisibleLanguages - 1 // Number of individual languages before grouping into "Other"
+	percentPrecision    = 10                      // One decimal precision (e.g. 10.4%)
 )
 
-// calculateStats converts language byte counts to percentages.
+// calculateStats computes language percentages by raw bytes or geometric mean.
 // Languages are sorted by descending percentage, then ascending name.
 // If more than maxVisibleLanguages exist, languages beyond topLanguagesCount are grouped into "Other".
-func calculateStats(languageTotals map[string]int) []Lang {
-	// Calculate total bytes across all languages
-	totalBytes := 0
-	for _, bytes := range languageTotals {
-		totalBytes += bytes
+func calculateStats(languageTotals, languageFreq map[string]int, mode string) []Lang {
+	scores := make(map[string]float64)
+	var totalScore float64
+
+	for lang, bytes := range languageTotals {
+		freq := languageFreq[lang]
+		var score float64
+
+		switch mode {
+		case "geometric": // Geometric mean: sqrt(bytes * freq)
+			score = math.Sqrt(float64(bytes) * float64(freq))
+		default: // Raw byte count
+			score = float64(bytes)
+		}
+
+		scores[lang] = score
+		totalScore += score
 	}
 
 	var result []Lang
-	for lang, bytes := range languageTotals {
+	for lang, score := range scores {
 		result = append(result, Lang{
 			Name:    lang,
-			Percent: float64(bytes) / float64(totalBytes) * 100,
+			Percent: score / totalScore * 100,
 		})
 	}
 

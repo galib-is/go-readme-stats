@@ -27,7 +27,7 @@ type Lang struct {
 
 // FetchStats retrieves language statistics for the authenticated user.
 // Excludes forked repositories and languages from the ignored languages file.
-func FetchStats(ignoredLanguagesData []byte) ([]Lang, error) {
+func FetchStats(ignoredLanguagesData []byte, mode string) ([]Lang, error) {
 	repos, err := fetchRepoNames()
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch repositories: %w", err)
@@ -44,6 +44,8 @@ func FetchStats(ignoredLanguagesData []byte) ([]Lang, error) {
 	}
 
 	languageTotals := make(map[string]int)
+	languageFreq := make(map[string]int)
+
 	for _, repo := range repos {
 		if repo.Fork {
 			continue
@@ -61,10 +63,11 @@ func FetchStats(ignoredLanguagesData []byte) ([]Lang, error) {
 			}
 
 			languageTotals[lang] += bytes
+			languageFreq[lang]++
 		}
 	}
 
-	stats := calculateStats(languageTotals)
+	stats := calculateStats(languageTotals, languageFreq, mode)
 	if err := addLanguageColours(stats); err != nil {
 		return nil, fmt.Errorf("failed to add colours: %w", err)
 	}

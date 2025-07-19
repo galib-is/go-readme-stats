@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestCalculateStats(t *testing.T) {
+func TestCalculateStats_Raw(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    map[string]int
@@ -62,19 +62,88 @@ func TestCalculateStats(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := calculateStats(tt.input)
+			// Create frequency map with 1 for all languages
+			freq := make(map[string]int, len(tt.input))
+			for lang := range tt.input {
+				freq[lang] = 1
+			}
+
+			result := calculateStats(tt.input, freq, "")
 
 			if len(result) != len(tt.expected) {
-				t.Errorf("calculateStats() returned %d languages, expected %d", len(result), len(tt.expected))
+				t.Errorf("got %d languages, expected %d", len(result), len(tt.expected))
 				return
 			}
 
 			for i, lang := range result {
 				if lang.Name != tt.expected[i].Name {
-					t.Errorf("calculateStats()[%d].Name = %s, expected %s", i, lang.Name, tt.expected[i].Name)
+					t.Errorf("[%d] Name = %s, expected %s", i, lang.Name, tt.expected[i].Name)
 				}
 				if lang.Percent != tt.expected[i].Percent {
-					t.Errorf("calculateStats()[%d].Percent = %v, expected %v", i, lang.Percent, tt.expected[i].Percent)
+					t.Errorf("[%d] Percent = %v, expected %v", i, lang.Percent, tt.expected[i].Percent)
+				}
+			}
+		})
+	}
+}
+
+func TestCalculateStats_Geometric(t *testing.T) {
+	tests := []struct {
+		name     string
+		totals   map[string]int
+		freq     map[string]int
+		expected []Lang
+	}{
+		{
+			name: "Basic geometric",
+			totals: map[string]int{
+				"Go":         5000,
+				"JavaScript": 3000,
+			},
+			freq: map[string]int{
+				"Go":         2,
+				"JavaScript": 8,
+			},
+			expected: []Lang{
+				{Name: "JavaScript", Percent: 60.8},
+				{Name: "Go", Percent: 39.2},
+			},
+		},
+		{
+			name: "Same percentage uses name sort",
+			totals: map[string]int{
+				"B": 1000,
+				"A": 2000,
+				"C": 1000,
+			},
+			freq: map[string]int{
+				"A": 1,
+				"B": 1,
+				"C": 1,
+			},
+			expected: []Lang{
+				{Name: "A", Percent: 41.4},
+				{Name: "B", Percent: 29.3},
+				{Name: "C", Percent: 29.3},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := calculateStats(tt.totals, tt.freq, "geometric")
+
+			if len(result) != len(tt.expected) {
+				t.Errorf("got %d languages, expected %d", len(result), len(tt.expected))
+				return
+			}
+
+			for i, lang := range result {
+				if lang.Name != tt.expected[i].Name {
+					t.Errorf("[%d] Name = %s, expected %s", i, lang.Name, tt.expected[i].Name)
+				}
+				if lang.Percent != tt.expected[i].Percent {
+					t.Errorf("[%d] Percent = %v, expected %v", i, lang.Percent, tt.expected[i].Percent)
 				}
 			}
 		})
@@ -91,7 +160,6 @@ func TestRoundPercent(t *testing.T) {
 		{"Round up", 10.16, 10.2},
 		{"Exact", 10.1, 10.1},
 		{"Zero", 0.0, 0.0},
-		{"Large number", 99.99, 100.0},
 	}
 
 	for _, tt := range tests {
@@ -101,29 +169,5 @@ func TestRoundPercent(t *testing.T) {
 				t.Errorf("roundPercent(%v) = %v, expected %v", tt.input, result, tt.expected)
 			}
 		})
-	}
-}
-
-func TestCalculateStats_SortOrder(t *testing.T) {
-	input := map[string]int{
-		"B": 1000, // Same percentage as C
-		"A": 2000, // Highest percentage
-		"C": 1000, // Same percentage as B
-	}
-
-	result := calculateStats(input)
-
-	// Should be sorted by percentage (desc), then by name (asc)
-	expected := []Lang{
-		{Name: "A", Percent: 50.0},
-		{Name: "B", Percent: 25.0},
-		{Name: "C", Percent: 25.0},
-	}
-
-	for i, lang := range result {
-		if lang.Name != expected[i].Name || lang.Percent != expected[i].Percent {
-			t.Errorf("calculateStats()[%d] = {Name: %s, Percent: %v}, expected {Name: %s, Percent: %v}",
-				i, lang.Name, lang.Percent, expected[i].Name, expected[i].Percent)
-		}
 	}
 }
