@@ -34,6 +34,11 @@ func TestAllPredefinedThemes(t *testing.T) {
 			if theme.Background == "" {
 				t.Errorf("'%s' has empty Background", name)
 			}
+
+			if theme.Border == "" {
+				t.Errorf("'%s' has empty Border", name)
+			}
+
 			if theme.Text == "" {
 				t.Errorf("'%s' has empty Text", name)
 			}
