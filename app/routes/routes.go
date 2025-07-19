@@ -12,6 +12,7 @@ func Register(app *gin.Engine) {
 	app.NoRoute(ErrRouter)
 
 	app.GET("/favicon.ico", handler.Favicon)
+	app.GET("/favicon.png", handler.Favicon)
 
 	route := app.Group("/api")
 	{
@@ -20,7 +21,11 @@ func Register(app *gin.Engine) {
 }
 
 func ErrRouter(c *gin.Context) {
-	c.JSON(http.StatusBadRequest, gin.H{
-		"errors": "this page could not be found",
+	c.JSON(http.StatusNotFound, gin.H{
+		"error": gin.H{
+			"code":    404,
+			"message": "Not Found",
+			"details": "This API endpoint does not exist.",
+		},
 	})
 }
