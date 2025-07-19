@@ -17,6 +17,12 @@ var themes = map[string]Theme{
 		Text:          "#F0F6FC",
 		SecondaryText: "#9198A1",
 	},
+	"soft-dark": {
+		Background:    "#212830",
+		Border:        "#353C44",
+		Text:          "#D1D7E0",
+		SecondaryText: "#9198A1",
+	},
 	"light": {
 		Background:    "#FFFFFF",
 		Border:        "#DFE4E9",
