@@ -5,9 +5,10 @@ import (
 )
 
 func TestLoadLanguageColours(t *testing.T) {
-	colours, err := loadLanguageColours("../../internal/data/colours.json")
+	colours, err := loadLanguageColours()
 	if err != nil {
 		t.Errorf("loadLanguageColours() error = %v", err)
+		return
 	}
 
 	if len(colours) == 0 {
@@ -21,17 +22,12 @@ func TestLoadLanguageColours(t *testing.T) {
 	}
 }
 
-func TestLoadLanguageColours_InvalidFile(t *testing.T) {
-	_, err := loadLanguageColours("nonexistent.json")
-	if err == nil {
-		t.Error("loadLanguageColours() expected error for nonexistent file")
-	}
-}
-
-func TestReadIgnoredLanguages(t *testing.T) {
-	ignored, err := readIgnoredLanguages("../../config/ignored_languages.json")
+func TestParseIgnoredLanguages(t *testing.T) {
+	testData := []byte(`["HTML", "CSS"]`)
+	ignored, err := parseIgnoredLanguages(testData)
 	if err != nil {
-		t.Errorf("readIgnoredLanguages() error = %v", err)
+		t.Errorf("parseIgnoredLanguages() error = %v", err)
+		return
 	}
 
 	if _, exists := ignored["HTML"]; !exists {
@@ -43,10 +39,10 @@ func TestReadIgnoredLanguages(t *testing.T) {
 	}
 }
 
-func TestReadIgnoredLanguages_InvalidFile(t *testing.T) {
-	_, err := readIgnoredLanguages("nonexistent.json")
+func TestParseIgnoredLanguages_InvalidFile(t *testing.T) {
+	_, err := parseIgnoredLanguages([]byte("{invalid}"))
 	if err == nil {
-		t.Error("readIgnoredLanguages() expected error for nonexistent file")
+		t.Error("parseIgnoredLanguages() expected error for invalid JSON")
 	}
 }
 
@@ -60,13 +56,18 @@ func TestAddLanguageColours(t *testing.T) {
 	err := addLanguageColours(languages)
 	if err != nil {
 		t.Errorf("addLanguageColours() error = %v", err)
+		return
 	}
 
-	if languages[0].Colour == "" {
-		t.Error("Go language should have a colour assigned")
+	if languages[0].Colour != "#00ADD8" {
+		t.Errorf("Go language colour = %s, want #00ADD8", languages[0].Colour)
 	}
 
 	if languages[1].Colour != defaultColour {
 		t.Errorf("Unknown language colour = %s, want %s", languages[1].Colour, defaultColour)
+	}
+
+	if languages[2].Colour == "" {
+		t.Error("Java language should have a colour assigned")
 	}
 }

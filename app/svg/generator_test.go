@@ -1,7 +1,7 @@
 package svg
 
 import (
-	"go-readme-stats/internal/stats"
+	"go-readme-stats/app/stats"
 	"testing"
 )
 

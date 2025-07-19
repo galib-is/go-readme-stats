@@ -64,8 +64,11 @@ func callAPI(url string) ([]byte, error) {
 	}
 
 	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
-		req.Header.Set("Authorization", "token "+token)
+		req.Header.Set("Authorization", "Bearer "+token)
 	}
+
+	req.Header.Set("Accept", "application/vnd.github+json")
+	req.Header.Set("User-Agent", "go-readme-stats")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

@@ -2,18 +2,21 @@ package svg
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"html/template"
 
-	"go-readme-stats/internal/stats"
+	"go-readme-stats/app/stats"
 )
 
 const (
 	baseHeight   = 114.5
 	heightStep   = 20.0
 	templateName = "template.svg"
-	templatePath = "internal/svg/template.svg"
 )
+
+//go:embed template.svg
+var templateContent string
 
 type SVGData struct {
 	Theme         Theme
@@ -47,7 +50,7 @@ func calculateSVGHeight(languageCount int) float64 {
 func generateSVG(data SVGData) (string, error) {
 	tmpl, err := template.New(templateName).Funcs(template.FuncMap{
 		"sumPrev": sumPreviousPercent,
-	}).ParseFiles(templatePath)
+	}).Parse(templateContent)
 
 	if err != nil {
 		return "", fmt.Errorf("failed to parse template: %w", err)

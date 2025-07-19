@@ -1,15 +1,17 @@
 package stats
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 )
 
+//go:embed colours.json
+var coloursJSON []byte
+
 const (
-	coloursFilePath = "internal/data/colours.json"
-	defaultColour   = "#F0F6FC"
+	defaultColour = "#F0F6FC"
 )
 
 type repository struct {
@@ -25,15 +27,15 @@ type Lang struct {
 
 // FetchStats retrieves language statistics for the authenticated user.
 // Excludes forked repositories and languages from the ignored languages file.
-func FetchStats(ignoredLanguagesPath string) ([]Lang, error) {
+func FetchStats(ignoredLanguagesData []byte) ([]Lang, error) {
 	repos, err := fetchRepoNames()
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch repositories: %w", err)
 	}
 
-	ignoredLanguages, err := readIgnoredLanguages(ignoredLanguagesPath)
+	ignoredLanguages, err := parseIgnoredLanguages(ignoredLanguagesData)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read ignored languages: %w", err)
+		return nil, fmt.Errorf("failed to parse ignored languages: %w", err)
 	}
 
 	username, err := getUsername()
@@ -70,7 +72,7 @@ func FetchStats(ignoredLanguagesPath string) ([]Lang, error) {
 }
 
 func addLanguageColours(languages []Lang) error {
-	colours, err := loadLanguageColours(coloursFilePath)
+	colours, err := loadLanguageColours()
 	if err != nil {
 		log.Printf("Warning: Failed to load colours: %v", err)
 		colours = make(map[string]string)
@@ -87,29 +89,19 @@ func addLanguageColours(languages []Lang) error {
 	return nil
 }
 
-func loadLanguageColours(path string) (map[string]string, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read colours file %s: %w", path, err)
-	}
-
+func loadLanguageColours() (map[string]string, error) {
 	var colours map[string]string
-	if err := json.Unmarshal(data, &colours); err != nil {
-		return nil, fmt.Errorf("failed to parse colours file %s: %w", path, err)
+	if err := json.Unmarshal(coloursJSON, &colours); err != nil {
+		return nil, fmt.Errorf("failed to parse embedded colours: %w", err)
 	}
 
 	return colours, nil
 }
 
-func readIgnoredLanguages(path string) (map[string]struct{}, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read %s: %w", path, err)
-	}
-
+func parseIgnoredLanguages(data []byte) (map[string]struct{}, error) {
 	var languages []string
 	if err := json.Unmarshal(data, &languages); err != nil {
-		return nil, fmt.Errorf("failed to decode %s: %w", path, err)
+		return nil, fmt.Errorf("failed to decode ignored languages: %w", err)
 	}
 
 	set := make(map[string]struct{})
