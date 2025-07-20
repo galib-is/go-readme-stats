@@ -12,7 +12,7 @@ import (
 
 const (
 	url        = "https://raw.githubusercontent.com/github-linguist/linguist/refs/heads/main/lib/linguist/languages.yml"
-	outputPath = "app/handler/colours.json"
+	outputPath = "app/stats/colours.json"
 )
 
 // FetchLanguageColours downloads and converts GitHub's language colours to JSON.
