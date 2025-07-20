@@ -10,7 +10,24 @@ on:
             - main
 
 jobs:
+    Test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: ./.github/actions/setup-go
+
+            - name: Run tests
+              run: go test ./... -v
+
+            - name: Run tests with coverage
+              run: go test ./... -coverprofile=coverage.out
+
+            - name: Display coverage
+              run: go tool cover -func=coverage.out
+
     Deploy-Preview:
+        needs: Test
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
